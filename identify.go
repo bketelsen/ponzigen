@@ -61,6 +61,10 @@ func (g Generator) qf(pkg *types.Package) string {
 	return pkg.Name()
 }
 
+func (g Generator) SourcePackage() string {
+	return g.pkg.Name()
+}
+
 func (g Generator) Package() string {
 	if g.namePkg != "" {
 		return g.namePkg
@@ -94,18 +98,20 @@ var (
 * CODE GENERATED AUTOMATICALLY WITH github.com/bketelsen/ponzigen
 * THIS FILE SHOULD NOT BE EDITED BY HAND
 */
-
+{{$sp := .SourcePackage}}
 package {{.Package}}
 
 import (
 	"github.com/bketelsen/ponzi"
+	"time"
+	"github.com/pkg/errors"
 	"{{.PackagePath}}"
 )
 
 var BaseURL string 
 
 {{ range $n,$s := .Targets }}type {{$n}}ListResult struct {
-	Data []{{$n}} ` + "`" + "json:" + "\"" + "data" + "\"`" + `
+	Data []{{$sp}}.{{$n}} ` + "`" + "json:" + "\"" + "data" + "\"`" + `
 }
 {{ end }}
 
@@ -119,30 +125,30 @@ var BaseURL string
 }
 {{ end }}
 
-{{ range $n,$s := .Targets }}func Get{{$n}}(id int) (content.{{$n}}, error) {
+{{ range $n,$s := .Targets }}func Get{{$n}}(id int) ({{$sp}}.{{$n}}, error) {
 	init{{$n}}Cache()
 	var sp {{$n}}ListResult
 	err := {{lower $n}}Cache.Get(id, "{{$n}}", &sp)
 	if err != nil {
-		return content.{{$n}}{}, err
+		return {{$sp}}.{{$n}}{}, err
 	}
 	if len(sp.Data) == 0 {
-		return content.{{$n}}{}, errors.New("Not Found")
+		return {{$sp}}.{{$n}}{}, errors.New("Not Found")
 	}
 	return sp.Data[0], err
 
 }
 {{ end }}
 
-{{ range $n,$s := .Targets }}func Get{{$n}}List() ([]content.{{$n}}, error) {
+{{ range $n,$s := .Targets }}func Get{{$n}}List() ([]{{$sp}}.{{$n}}, error) {
 	init{{$n}}Cache()
 	var sp {{$n}}ListResult
 	err := {{lower $n}}Cache.GetAll("{{$n}}", &sp)
 	if err != nil {
-		return []content.{{$n}}{}, err
+		return []{{$sp}}.{{$n}}{}, err
 	}
 	if len(sp.Data) == 0 {
-		return []content.{{$n}}{}, errors.New("Not Found")
+		return []{{$sp}}.{{$n}}{}, errors.New("Not Found")
 	}
 	return sp.Data, err
 
