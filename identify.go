@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"go/types"
 	"io"
 	"path/filepath"
@@ -42,7 +41,6 @@ func NewGenerator(pkg string) (*Generator, error) {
 
 		obj := p.Scope().Lookup(name)
 		if _, ok := obj.Type().Underlying().(*types.Struct); ok {
-			fmt.Println(obj.Type().Underlying())
 			if !strings.Contains(name, "ListResult") {
 				targets[name] = obj.Type().Underlying().(*types.Struct)
 			}
@@ -106,6 +104,11 @@ import (
 
 var BaseURL string 
 
+{{ range $n,$s := .Targets }}type {{$n}}ListResult struct {
+	Data []{{$n}} ` + "`" + "json:" + "\"" + "data" + "\"`" + `
+}
+{{ end }}
+
 {{ range $n,$s := .Targets }}var {{lower $n}}Cache *ponzi.Cache
 {{ end }}
 
@@ -118,7 +121,7 @@ var BaseURL string
 
 {{ range $n,$s := .Targets }}func Get{{$n}}(id int) (content.{{$n}}, error) {
 	init{{$n}}Cache()
-	var sp content.{{$n}}ListResult
+	var sp {{$n}}ListResult
 	err := {{lower $n}}Cache.Get(id, "{{$n}}", &sp)
 	if err != nil {
 		return content.{{$n}}{}, err
@@ -133,7 +136,7 @@ var BaseURL string
 
 {{ range $n,$s := .Targets }}func Get{{$n}}List() ([]content.{{$n}}, error) {
 	init{{$n}}Cache()
-	var sp content.{{$n}}ListResult
+	var sp {{$n}}ListResult
 	err := {{lower $n}}Cache.GetAll("{{$n}}", &sp)
 	if err != nil {
 		return []content.{{$n}}{}, err
