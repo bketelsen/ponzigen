@@ -31,7 +31,7 @@ func render(suffix string, w io.Writer, packageName string, types []GeneratedTyp
 
 	switch suffix {
 	case "ponzi":
-		return ponziTemplate.Execute(w, generateTemplateData{packageName, types})
+		return ponziTmpl.Execute(w, generateTemplateData{packageName, types})
 	}
 	return errors.New("Unknown template")
 }
