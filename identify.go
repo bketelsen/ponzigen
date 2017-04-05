@@ -153,20 +153,6 @@ var BaseURL string
 
 }
 {{ end }}
-{{ range $n,$s := .Targets }}func Get{{$n}}BySlug(slug string) ({{$sp}}.{{$n}}, error) {
-       init{{$n}}Cache()
-       var sp {{$n}}ListResult
-       err := {{lower $n}}Cache.GetBySlug(slug, "{{$n}}", &sp)
-       if err != nil {
-               return {{$sp}}.{{$n}}{}, err
-       }
-       if len(sp.Data) == 0 {
-              return {{$sp}}.{{$n}}{}, errors.New("Not Found")
-       }
-       return sp.Data[0], err
-
-}
-{{ end }}
 {{ range $n,$s := .Targets }}func Get{{$n}}List() ([]{{$sp}}.{{$n}}, error) {
 	init{{$n}}Cache()
 	var sp {{$n}}ListResult
